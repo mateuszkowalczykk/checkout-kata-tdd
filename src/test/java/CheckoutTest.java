@@ -17,4 +17,8 @@ public class CheckoutTest {
     void canScanItem() {
         checkout.scan("A");
     }
+    @Test
+    void canGetTotalPrice() {
+        checkout.getTotalPrice();
+    }
 }
