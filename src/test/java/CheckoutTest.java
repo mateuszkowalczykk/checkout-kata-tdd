@@ -30,8 +30,15 @@ public class CheckoutTest {
         checkout.getTotalPrice();
     }
     @Test
-    void canScanAndGetPriceOfA() {
+    void canScanAndGetPriceWithoutSpecialOffers() {
         multiScan("ABA");
         assertThat(checkout.getTotalPrice()).isEqualTo(130);
     }
+    @Test
+    void handleSpecialOffers() {
+        multiScan("ABADCBA");
+        assertThat(checkout.getTotalPrice()).isEqualTo(210);
+    }
+
+
 }
