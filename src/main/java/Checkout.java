@@ -3,8 +3,8 @@ import java.io.FileNotFoundException;
 import java.util.*;
 
 public class Checkout {
-    List<String> scannedItems = new ArrayList<>();
-    Map<String,Integer> pricingRules = new HashMap<>();
+    Map<Item,Integer> scannedItems = new HashMap();
+    Set<Item> pricingRules = new HashSet<>();
 
     public Checkout(String path) {
         try {
@@ -15,17 +15,26 @@ public class Checkout {
     }
 
     public void scan(String itemName){
-        if(pricingRules.containsKey(itemName)){
-            scannedItems.add(itemName);
+        Item item = pricingRules.stream()
+                .filter(item1 -> item1.getName().equalsIgnoreCase(itemName))
+                .findFirst()
+                .get();
+        if(scannedItems.containsKey(item)){
+            scannedItems.put(item,scannedItems.get(item)+1);
         }else{
-            System.out.println("Sorry. Not found item in database");
+            scannedItems.put(item,1);
         }
     }
 
     public int getTotalPrice(){
         int totalPrice = 0;
-        for(String itemName : scannedItems){
-            totalPrice += pricingRules.get(itemName);
+        for(Item item : scannedItems.keySet()){
+            if(item.getNumbersOfItemsToSpecialOffer() ==0){
+                totalPrice += item.getPrice() * scannedItems.get(item);
+            }else{
+                totalPrice += scannedItems.get(item) / item.getNumbersOfItemsToSpecialOffer() * item.getPriceForSpecialOfferSet();
+                totalPrice += scannedItems.get(item) % item.getNumbersOfItemsToSpecialOffer() * item.getPrice();
+            }
         }
         return totalPrice;
     }
@@ -37,7 +46,13 @@ public class Checkout {
             String[] itemData = loadedFile.nextLine().split(";");
             String itemName = itemData[0];
             int price = Integer.parseInt(itemData[1]);
-            pricingRules.put(itemName,price);
+            if(itemData.length >2){
+                int numbersOfItemsToSpecialOffer = Integer.parseInt(itemData[2]);
+                int priceForSpecialOfferSet = Integer.parseInt(itemData[3]);
+                pricingRules.add(new Item(itemName,price,numbersOfItemsToSpecialOffer,priceForSpecialOfferSet));
+            }else{
+                pricingRules.add(new Item(itemName,price));
+            }
         }
     }
 }
