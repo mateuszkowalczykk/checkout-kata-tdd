@@ -1,4 +1,5 @@
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.*;
 
 public class Checkout {
@@ -7,21 +8,18 @@ public class Checkout {
 
     public Checkout(String path) {
         try {
-            File file = new File(path);
-            Scanner loadedFile = new Scanner(file);
-            while (loadedFile.hasNextLine()) {
-                String[] itemData = loadedFile.nextLine().split(";");
-                String itemName = itemData[0];
-                int price = Integer.parseInt(itemData[1]);
-                pricingRules.put(itemName,price);
-            }
-        }catch(Exception e){
+            loadPricingRules(path);
+        }catch(FileNotFoundException e){
             System.out.println(e.getMessage());
         }
     }
 
     public void scan(String itemName){
-        scannedItems.add(itemName);
+        if(pricingRules.containsKey(itemName)){
+            scannedItems.add(itemName);
+        }else{
+            System.out.println("Sorry. Not found item in database");
+        }
     }
 
     public int getTotalPrice(){
@@ -32,5 +30,14 @@ public class Checkout {
         return totalPrice;
     }
 
-
+    private void loadPricingRules(String path) throws FileNotFoundException {
+        File file = new File(path);
+        Scanner loadedFile = new Scanner(file);
+        while (loadedFile.hasNextLine()) {
+            String[] itemData = loadedFile.nextLine().split(";");
+            String itemName = itemData[0];
+            int price = Integer.parseInt(itemData[1]);
+            pricingRules.put(itemName,price);
+        }
+    }
 }
