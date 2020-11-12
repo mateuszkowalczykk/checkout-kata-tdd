@@ -1,16 +1,20 @@
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Scanner;
 
 public class Checkout {
-    Map<Item,Integer> scannedItems = new HashMap();
-    Set<Item> pricingRules = new HashSet<>();
+    HashMap<Item,Integer> scannedItems = new HashMap<>();
+    HashSet<Item> pricingRules = new HashSet<>();
 
     public Checkout(String path) {
         try {
             loadPricingRules(path);
         }catch(FileNotFoundException e){
             System.out.println(e.getMessage());
+        }catch(Exception e){
+            System.out.println("Wrong pricing_rule format");
         }
     }
 
@@ -18,7 +22,11 @@ public class Checkout {
         Item item = pricingRules.stream()
                 .filter(item1 -> item1.getName().equalsIgnoreCase(itemName))
                 .findFirst()
-                .get();
+                .orElse(null);
+        if(item == null) {
+            System.out.println("Sorry. Not found item in database");
+            return;
+        }
         if(scannedItems.containsKey(item)){
             scannedItems.put(item,scannedItems.get(item)+1);
         }else{
@@ -29,7 +37,7 @@ public class Checkout {
     public int getTotalPrice(){
         int totalPrice = 0;
         for(Item item : scannedItems.keySet()){
-            if(item.getNumbersOfItemsToSpecialOffer() ==0){
+            if(item.getNumbersOfItemsToSpecialOffer() == 0){
                 totalPrice += item.getPrice() * scannedItems.get(item);
             }else{
                 totalPrice += scannedItems.get(item) / item.getNumbersOfItemsToSpecialOffer() * item.getPriceForSpecialOfferSet();
