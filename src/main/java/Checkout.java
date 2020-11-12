@@ -7,5 +7,9 @@ public class Checkout {
 
     }
 
+    public int getTotalPrice(){
+        return 0;
+    }
+
 
 }
