@@ -1,8 +1,16 @@
+import static org.assertj.core.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class CheckoutTest {
     Checkout checkout;
+
+    public void multiScan(String string){
+        for(String itemName : string.split("")){
+            checkout.scan(itemName);
+        }
+    }
+
     @BeforeEach
     void setUp() {
         checkout = new Checkout("src/main/resources/pricing_rules.txt");
@@ -20,5 +28,10 @@ public class CheckoutTest {
     @Test
     void canGetTotalPrice() {
         checkout.getTotalPrice();
+    }
+    @Test
+    void canScanAndGetPriceOfA() {
+        multiScan("ABA");
+        assertThat(checkout.getTotalPrice()).isEqualTo(130);
     }
 }
